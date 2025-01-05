@@ -1,30 +1,33 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+import 'ticket_detail_model.dart';
+
 class Transaction {
   final String id;
   final String userId;
-  final String eventId;
-  final double amount;
   final DateTime date;
   final String type; // "TICKET_PURCHASE" or "WALLET_TOPUP"
+  final List<TicketDetail> ticketDetails; // Danh sách các vé mua trong giao dịch
 
   Transaction({
     required this.id,
     required this.userId,
-    required this.eventId,
-    required this.amount,
     required this.date,
     required this.type,
+    required this.ticketDetails, // Thêm danh sách vé vào constructor
   });
 
   factory Transaction.fromMap(Map<String, dynamic> map) {
+    var ticketDetailsFromMap = (map['ticket_details'] as List)
+        .map((ticketDetail) => TicketDetail.fromMap(ticketDetail))
+        .toList();
+
     return Transaction(
       id: map['id'] ?? '',
       userId: map['user_id'] ?? '',
-      eventId: map['event_id'] ?? '',
-      amount: map['amount'].toDouble(),
       date: (map['date'] as Timestamp).toDate(),
       type: map['type'] ?? '',
+      ticketDetails: ticketDetailsFromMap, // Đọc ticketDetails từ Firestore
     );
   }
 
@@ -32,10 +35,9 @@ class Transaction {
     return {
       'id': id,
       'user_id': userId,
-      'event_id': eventId,
-      'amount': amount,
       'date': date,
       'type': type,
+      'ticket_details': ticketDetails.map((e) => e.toMap()).toList(), // Lưu ticketDetails vào Firestore
     };
   }
 }

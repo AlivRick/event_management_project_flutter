@@ -1,15 +1,4 @@
-buildscript {
-    ext.kotlin_version = '1.7.10' // Đảm bảo Kotlin phù hợp với Gradle và các plugin
-    repositories {
-        google()
-        mavenCentral()
-    }
-    dependencies {
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
-        classpath 'com.google.gms:google-services:4.4.1' // Sử dụng phiên bản chính xác
-        classpath 'com.android.tools.build:gradle:8.2.0'
-    }
-}
+
     allprojects {
         repositories {
             google()

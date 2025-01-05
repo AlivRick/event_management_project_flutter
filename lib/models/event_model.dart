@@ -6,10 +6,8 @@ class Event {
   final String description;
   final String location;
   final DateTime date;
-  final double ticketPrice;
-  final int maxTickets;
-  final int soldTickets;
   final String status;
+  final String? imageUrl; // URL ảnh (có thể null)
 
   Event({
     required this.id,
@@ -17,10 +15,8 @@ class Event {
     required this.description,
     required this.location,
     required this.date,
-    required this.ticketPrice,
-    required this.maxTickets,
-    required this.soldTickets,
     required this.status,
+    this.imageUrl, // Thêm trường imageUrl
   });
 
   factory Event.fromMap(Map<String, dynamic> map) {
@@ -30,10 +26,8 @@ class Event {
       description: map['description'] ?? '',
       location: map['location'] ?? '',
       date: (map['date'] as Timestamp).toDate(),
-      ticketPrice: map['ticket_price'].toDouble(),
-      maxTickets: map['max_tickets'],
-      soldTickets: map['sold_tickets'],
       status: map['status'],
+      imageUrl: map['imageUrl'], // Đọc imageUrl từ Firestore
     );
   }
 
@@ -44,10 +38,9 @@ class Event {
       'description': description,
       'location': location,
       'date': date,
-      'ticket_price': ticketPrice,
-      'max_tickets': maxTickets,
-      'sold_tickets': soldTickets,
       'status': status,
+      'imageUrl': imageUrl, // Ghi imageUrl vào Firestore
     };
   }
 }
+

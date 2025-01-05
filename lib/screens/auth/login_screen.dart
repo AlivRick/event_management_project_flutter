@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../services/auth_service.dart';
+import '../user/event_list_screen.dart'; // Import màn hình EventListScreen
 import 'register_screen.dart'; // Import màn hình đăng ký
 
 class LoginScreen extends StatefulWidget {
@@ -36,9 +37,9 @@ class _LoginScreenState extends State<LoginScreen> {
             _isLoading
                 ? CircularProgressIndicator()
                 : ElevatedButton(
-                    onPressed: _handleLogin,
-                    child: Text("Login"),
-                  ),
+              onPressed: _handleLogin,
+              child: Text("Login"),
+            ),
             TextButton(
               onPressed: () {
                 // Điều hướng đến màn hình đăng ký
@@ -67,8 +68,11 @@ class _LoginScreenState extends State<LoginScreen> {
       );
 
       if (user != null) {
-        // Điều hướng đến màn hình sự kiện
-        Navigator.pushReplacementNamed(context, '/event_list');
+        // Điều hướng đến màn hình EventListScreen
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => EventListScreen()),
+        );
       } else {
         _showErrorSnackBar("Login failed. Please try again.");
       }

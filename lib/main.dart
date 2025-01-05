@@ -3,9 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'firebase_options.dart';
-import 'screens/auth/login_screen.dart'; // Import màn hình đăng nhập
+// Import màn hình đăng nhập
 import 'screens/admin/admin_dashboard.dart'; // Import màn hình dành cho Admin
-import 'screens/user/event_list_screen.dart'; // Import màn hình dành cho User
+import 'screens/user/event_list_screen.dart';
+import 'screens/user/home_screen.dart'; // Import màn hình dành cho User
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -47,8 +48,8 @@ class AuthWrapper extends StatelessWidget {
         final user = snapshot.data;
 
         if (user == null) {
-          // Nếu chưa đăng nhập, chuyển đến màn hình đăng nhập
-          return LoginScreen();
+          // Nếu chưa đăng nhập, hiển thị trang Home
+          return HomeScreen();
         } else {
           // Nếu đã đăng nhập, kiểm tra vai trò
           return FutureBuilder<bool>(
@@ -92,3 +93,4 @@ class AuthWrapper extends StatelessWidget {
     }
   }
 }
+
