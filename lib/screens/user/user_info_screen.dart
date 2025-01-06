@@ -13,7 +13,7 @@ class UserInfoScreen extends StatelessWidget {
       return Scaffold(
         appBar: AppBar(
           title: Text("Thông tin người dùng"),
-          backgroundColor: Colors.blueAccent,
+          backgroundColor: Color(0xFF3498DB),
         ),
         body: Center(
           child: Text(
@@ -52,7 +52,7 @@ class UserInfoScreen extends StatelessWidget {
           return Scaffold(
             backgroundColor: Colors.grey[100],
             appBar: AppBar(
-              backgroundColor: Colors.blueAccent,
+              backgroundColor: Color(0xFF3498DB),
               title: Text("Thông tin cá nhân"),
               centerTitle: true,
             ),
@@ -63,8 +63,8 @@ class UserInfoScreen extends StatelessWidget {
                   SizedBox(height: 20),
                   CircleAvatar(
                     radius: 50,
-                    backgroundColor: Colors.lightBlueAccent[100],
-                    child: Icon(Icons.person, size: 60, color: Colors.blueAccent),
+                    backgroundColor: Color(0xFFFFC0CB), // Hồng nhạt
+                    child: Icon(Icons.person, size: 60, color: Color(0xFF8E44AD)),
                   ),
                   SizedBox(height: 20),
                   Text(
@@ -100,7 +100,7 @@ class UserInfoScreen extends StatelessWidget {
                           ),
                           Divider(),
                           ListTile(
-                            leading: Icon(Icons.person_outline, color: Colors.lightBlue),
+                            leading: Icon(Icons.person_outline, color: Colors.blue),
                             title: Text(
                               "Vai trò",
                               style: TextStyle(fontSize: 18),
@@ -121,7 +121,10 @@ class UserInfoScreen extends StatelessWidget {
             bottomNavigationBar: Container(
               decoration: BoxDecoration(
                 gradient: LinearGradient(
-                  colors: [Colors.lightBlueAccent, Colors.cyanAccent],
+                  colors: [
+                    Color(0xFF8E44AD),
+                    Color(0xFF3498DB),
+                  ],
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
                 ),
@@ -130,13 +133,13 @@ class UserInfoScreen extends StatelessWidget {
               child: CurvedNavigationBar(
                 backgroundColor: Colors.transparent,
                 color: Colors.white,
-                buttonBackgroundColor: Colors.lightBlueAccent,
+                buttonBackgroundColor: Color(0xFFFFC0CB),
                 height: 60,
                 index: 1,
                 animationDuration: Duration(milliseconds: 300),
                 items: [
-                  Icon(Icons.event, size: 30, color: Colors.blueAccent),
-                  Icon(Icons.person, size: 30, color: Colors.blueAccent),
+                  Icon(Icons.event, size: 30, color: Colors.deepPurple),
+                  Icon(Icons.person, size: 30, color: Colors.deepPurple),
                 ],
                 onTap: (index) {
                   NavigationHelper.navigateToScreen(context, index);

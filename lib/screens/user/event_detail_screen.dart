@@ -15,30 +15,24 @@ class EventDetailScreen extends StatefulWidget {
 }
 
 class _EventDetailScreenState extends State<EventDetailScreen> {
-  // Danh sách vé người dùng đã chọn
   List<TicketType> selectedTickets = [];
 
-  // Hàm thêm loại vé vào danh sách đã chọn
   void _toggleTicketSelection(TicketType ticketType) {
     setState(() {
-      selectedTickets.add(ticketType); // Thêm một bản sao của vé vào danh sách
+      selectedTickets.add(ticketType);
     });
   }
 
-  // Giảm số lượng vé, xóa vé nếu số lượng = 1
   void _decreaseTicketQuantity(TicketType ticketType) {
     setState(() {
-      // Tìm và xóa 1 vé cụ thể nếu tồn tại trong danh sách
       int index = selectedTickets.indexWhere((ticket) => ticket.id == ticketType.id);
       if (index != -1) {
-        selectedTickets.removeAt(index); // Loại bỏ vé khỏi danh sách
+        selectedTickets.removeAt(index);
       }
     });
   }
 
-  // Lấy loại vé từ Firestore
   Future<List<TicketType>> _fetchTicketTypes() async {
-    // Lấy dữ liệu từ Firestore về các loại vé cho sự kiện này
     final ticketTypesSnapshot = await FirebaseFirestore.instance
         .collection('ticket_types')
         .where('event_id', isEqualTo: widget.event.id)
@@ -49,17 +43,11 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
     }).toList();
   }
 
-  // Lưu vé đã chọn vào giỏ hàng (tạo giỏ hàng mới)
   void _addToCart() async {
-    // Lưu giỏ hàng vào SharedPreferences
     await CartService.saveCart(selectedTickets);
-
-    // Thông báo thêm thành công
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text('Đã thêm vé vào giỏ hàng')),
     );
-
-    // Quay lại màn hình trước (giỏ hàng)
     Navigator.pop(context);
   }
 
@@ -68,22 +56,26 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
     final formattedDate = DateFormat('dd/MM/yyyy HH:mm').format(widget.event.date);
 
     return Scaffold(
-      appBar: AppBar(title: Text(widget.event.name)),
+      appBar: AppBar(
+        backgroundColor: Color(0xFF3498DB), // Consistent color with UserInfoScreen
+        title: Text(widget.event.name),
+        centerTitle: true,
+      ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(widget.event.description),
+            Text(widget.event.description, style: TextStyle(fontSize: 16)),
             SizedBox(height: 10),
-            Text("Địa điểm: ${widget.event.location}"),
+            Text("Địa điểm: ${widget.event.location}", style: TextStyle(fontSize: 16)),
             SizedBox(height: 10),
-            Text("Thời gian: $formattedDate"),
+            Text("Thời gian: $formattedDate", style: TextStyle(fontSize: 16)),
             SizedBox(height: 10),
-            Text("Trạng thái: ${widget.event.status}"),
+            Text("Trạng thái: ${widget.event.status}", style: TextStyle(fontSize: 16)),
             SizedBox(height: 20),
 
-            // Hiển thị loại vé
+            // Ticket Types section
             FutureBuilder<List<TicketType>>(
               future: _fetchTicketTypes(),
               builder: (context, snapshot) {
@@ -101,32 +93,39 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                       itemCount: ticketTypes.length,
                       itemBuilder: (context, index) {
                         final ticketType = ticketTypes[index];
-                        // Kiểm tra xem số vé đã bán có bằng số vé tối đa chưa
                         bool isSoldOut = ticketType.soldTickets >= ticketType.maxTickets;
-
-                        // Đếm số lần vé xuất hiện trong selectedTickets
                         int ticketCount = selectedTickets.where((ticket) => ticket.id == ticketType.id).length;
 
                         return Card(
-                          color: isSoldOut ? Colors.grey[300] : Colors.white, // Mờ đi nếu hết vé
+                          color: isSoldOut ? Colors.grey[300] : Colors.white,
+                          elevation: 5, // Add shadow to create a card-like effect
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          margin: EdgeInsets.symmetric(vertical: 8),
                           child: ListTile(
-                            title: Text(ticketType.name),
+                            title: Text(
+                              ticketType.name,
+                              style: TextStyle(fontWeight: FontWeight.bold),
+                            ),
                             subtitle: Text(
-                                "Giá: \$${ticketType.price.toStringAsFixed(2)}\n${isSoldOut ? "Hết vé" : "Còn vé"}"),
+                              "Giá: \$${ticketType.price.toStringAsFixed(2)}\n${isSoldOut ? "Hết vé" : "Còn vé"}",
+                              style: TextStyle(color: Colors.black54),
+                            ),
                             trailing: Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
                                 IconButton(
                                   icon: Icon(Icons.remove),
                                   onPressed: isSoldOut || ticketCount == 0
-                                      ? null // Không cho giảm nếu hết vé hoặc không còn vé trong giỏ
+                                      ? null
                                       : () => _decreaseTicketQuantity(ticketType),
                                 ),
-                                Text(ticketCount.toString()), // Hiển thị số lần vé xuất hiện trong giỏ
+                                Text(ticketCount.toString(), style: TextStyle(fontSize: 18)),
                                 IconButton(
                                   icon: Icon(Icons.add),
                                   onPressed: isSoldOut
-                                      ? null // Không cho thêm nếu hết vé
+                                      ? null
                                       : () => _toggleTicketSelection(ticketType),
                                 ),
                               ],
@@ -140,11 +139,17 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
               },
             ),
 
-            // Nút thêm vào giỏ hàng
+            // Add to cart button
             if (selectedTickets.isNotEmpty) ...[
               ElevatedButton(
                 onPressed: _addToCart,
-                child: Text("Thêm vào giỏ hàng"),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Color(0xFF3498DB), // Consistent button color
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+                child: Text("Thêm vào giỏ hàng", style: TextStyle(fontSize: 18)),
               ),
             ],
           ],
