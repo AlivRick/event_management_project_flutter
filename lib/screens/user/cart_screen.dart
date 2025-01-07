@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import '../../models/ticket_type_model.dart';
 import '../../services/cart_service.dart';
+import 'payment_screen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'payment_screen.dart'; // Import the PaymentScreen
 
 class CartScreen extends StatefulWidget {
   @override
@@ -11,16 +12,27 @@ class CartScreen extends StatefulWidget {
 
 class _CartScreenState extends State<CartScreen> {
   List<TicketType> cartItems = [];
+  String? userId;
 
   @override
   void initState() {
     super.initState();
     _loadCart();
+    _fetchCurrentUser();
   }
 
   void _loadCart() async {
     cartItems = await CartService.getCart();
     setState(() {});
+  }
+
+  void _fetchCurrentUser() {
+    final currentUser = FirebaseAuth.instance.currentUser;
+    if (currentUser != null) {
+      setState(() {
+        userId = currentUser.uid; // Lưu userId từ FirebaseAuth
+      });
+    }
   }
 
   void _removeFromCart(TicketType ticket) async {
@@ -52,11 +64,20 @@ class _CartScreenState extends State<CartScreen> {
   }
 
   void _navigateToPaymentScreen() {
-    // Navigate to PaymentScreen and pass the cart items (tickets)
+    if (userId == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Vui lòng đăng nhập trước khi thanh toán.")),
+      );
+      return;
+    }
+
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => PaymentScreen(tickets: cartItems),
+        builder: (context) => PaymentScreen(
+          tickets: cartItems,   // Truyền danh sách vé
+          userId: userId!,      // Truyền userId (đảm bảo không null)
+        ),
       ),
     );
   }
@@ -140,7 +161,10 @@ class _CartScreenState extends State<CartScreen> {
             ),
             padding: EdgeInsets.symmetric(vertical: 16),
           ),
-          child: Text('Thanh toán (${cartItems.length} vé)', style: TextStyle(fontSize: 18)),
+          child: Text(
+            'Thanh toán (${cartItems.length} vé)',
+            style: TextStyle(fontSize: 18),
+          ),
         ),
       ),
     );

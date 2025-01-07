@@ -13,7 +13,7 @@ class EventListScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Danh sách sự kiện"),
+        title: Text("Ticket Bờ Rồ"),
         backgroundColor: Color(0xFF3498DB), // Màu xanh lam
         actions: [
           IconButton(

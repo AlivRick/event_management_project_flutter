@@ -1,27 +1,26 @@
-
 class TicketDetail {
-  final String ticketTypeId; // Liên kết với loại vé
-  final int quantity; // Số lượng vé đã mua
-  final double price; // Giá vé
+  final String ticketTypeId;
+  final String id;
+  final double price;
 
   TicketDetail({
     required this.ticketTypeId,
-    required this.quantity,
+    required this.id,
     required this.price,
   });
 
   factory TicketDetail.fromMap(Map<String, dynamic> map) {
     return TicketDetail(
       ticketTypeId: map['ticket_type_id'] ?? '',
-      quantity: map['quantity'] ?? 0,
-      price: (map['price'] as num).toDouble(),
+      id: map['id'] ?? '',
+      price: (map['price'] as num?)?.toDouble() ?? 0.0,
     );
   }
 
   Map<String, dynamic> toMap() {
     return {
       'ticket_type_id': ticketTypeId,
-      'quantity': quantity,
+      'id': id,
       'price': price,
     };
   }
