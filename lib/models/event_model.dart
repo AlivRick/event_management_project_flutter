@@ -1,3 +1,4 @@
+// Event Model
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Event {
@@ -37,10 +38,9 @@ class Event {
       'name': name,
       'description': description,
       'location': location,
-      'date': date,
+      'date': Timestamp.fromDate(date), // Chuyển đổi DateTime thành Timestamp
       'status': status,
       'imageUrl': imageUrl, // Ghi imageUrl vào Firestore
     };
   }
 }
-

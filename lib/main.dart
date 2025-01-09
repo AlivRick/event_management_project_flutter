@@ -28,70 +28,9 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: AuthWrapper(), // Kiểm tra trạng thái và điều hướng
+      home: HomeScreen(), // HomeScreen is the entry point
       debugShowCheckedModeBanner: false,
     );
-  }
-}
-
-// AuthWrapper để điều hướng giữa Admin, User và màn hình đăng nhập
-class AuthWrapper extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return StreamBuilder<User?>(
-      stream: FirebaseAuth.instance.authStateChanges(),
-      builder: (context, snapshot) {
-        // Nếu chưa có dữ liệu từ Firebase Auth
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(child: CircularProgressIndicator());
-        }
-
-        final user = snapshot.data;
-
-        if (user == null) {
-          // Nếu chưa đăng nhập, hiển thị trang Home
-          return HomeScreen();
-        } else {
-          // Nếu đã đăng nhập, kiểm tra vai trò
-          return FutureBuilder<bool>(
-            future: checkIfAdmin(user),
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return const Center(child: CircularProgressIndicator());
-              } else if (snapshot.hasError) {
-                return Center(
-                  child: Text('Đã xảy ra lỗi: ${snapshot.error}'),
-                );
-              } else if (snapshot.hasData && snapshot.data == true) {
-                return AdminDashboard(); // Màn hình Admin
-              } else {
-                return EventListScreen(); // Màn hình User
-              }
-            },
-          );
-        }
-      },
-    );
-  }
-
-  // Hàm kiểm tra vai trò người dùng từ Firestore
-  Future<bool> checkIfAdmin(User user) async {
-    try {
-      final userDoc = await FirebaseFirestore.instance
-          .collection('users')
-          .doc(user.uid)
-          .get();
-
-      // Kiểm tra dữ liệu từ Firestore
-      if (userDoc.exists) {
-        final role = userDoc.data()?['role'];
-        return role == 'admin'; // Trả về true nếu là admin
-      } else {
-        return false; // Người dùng không tồn tại trong Firestore
-      }
-    } catch (e) {
-      throw Exception('Không thể kiểm tra vai trò người dùng: $e');
-    }
   }
 }
 

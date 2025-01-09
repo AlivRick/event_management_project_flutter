@@ -54,4 +54,5 @@ dependencies{
     implementation 'com.google.firebase:firebase-database'
     implementation 'androidx.fragment:fragment-ktx:1.5.7' // Thêm dòng này
     implementation 'com.google.android.material:material:1.9.0' // Nếu chưa có, thêm dòng này
+
 }

@@ -101,6 +101,7 @@ class PaymentService {
           ticketTypeId: ticket.id,
           id: ticketId, // Sử dụng Document ID của Firestore
           price: ticket.price,
+            isUsed : false
         ));
       }
 

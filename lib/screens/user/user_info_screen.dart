@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import '../../widgets/navigation_helper.dart';
-import 'wallet_screen.dart'; // Import WalletScreen
+import '../auth/login_screen.dart';
+import 'TicketScreen.dart';
+import 'wallet_screen.dart';
 
 class UserInfoScreen extends StatefulWidget {
   @override
@@ -14,6 +15,15 @@ class _UserInfoScreenState extends State<UserInfoScreen> {
   User? _currentUser;
   Map<String, dynamic>? _userData;
   bool _isLoading = true;
+
+  int _selectedIndex = 2; // Chỉ số mục được chọn
+
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+    NavigationHelper.navigateToScreen(context, index);
+  }
 
   @override
   void initState() {
@@ -30,8 +40,10 @@ class _UserInfoScreenState extends State<UserInfoScreen> {
         });
         return;
       }
-      final docSnapshot =
-      await FirebaseFirestore.instance.collection('users').doc(user.uid).get();
+      final docSnapshot = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.uid)
+          .get();
       setState(() {
         _currentUser = user;
         _userData = docSnapshot.data();
@@ -49,10 +61,6 @@ class _UserInfoScreenState extends State<UserInfoScreen> {
   Widget build(BuildContext context) {
     if (_isLoading) {
       return Scaffold(
-        appBar: AppBar(
-          title: Text("Thông tin người dùng"),
-          backgroundColor: Color(0xFF3498DB),
-        ),
         body: Center(
           child: CircularProgressIndicator(),
         ),
@@ -61,14 +69,11 @@ class _UserInfoScreenState extends State<UserInfoScreen> {
 
     if (_currentUser == null) {
       return Scaffold(
-        appBar: AppBar(
-          title: Text("Thông tin người dùng"),
-          backgroundColor: Color(0xFF3498DB),
-        ),
         body: Center(
           child: Text(
             "Chưa có người dùng nào đăng nhập.",
-            style: TextStyle(fontSize: 18),
+            style: TextStyle(
+                fontSize: 18, color: Colors.white, fontFamily: 'Roboto'),
           ),
         ),
       );
@@ -76,14 +81,11 @@ class _UserInfoScreenState extends State<UserInfoScreen> {
 
     if (_userData == null) {
       return Scaffold(
-        appBar: AppBar(
-          title: Text("Thông tin người dùng"),
-          backgroundColor: Color(0xFF3498DB),
-        ),
         body: Center(
           child: Text(
             "Không tìm thấy dữ liệu người dùng.",
-            style: TextStyle(fontSize: 18),
+            style: TextStyle(
+                fontSize: 18, color: Colors.white, fontFamily: 'Roboto'),
           ),
         ),
       );
@@ -92,13 +94,20 @@ class _UserInfoScreenState extends State<UserInfoScreen> {
     final userName = _userData!['name'] ?? 'N/A';
     final walletBalance = _userData!['walletBalance']?.toDouble() ?? 0.0;
     final role = _userData!['role'] ?? 'user';
-    final userId = _currentUser!.uid; // Lấy userId từ currentUser
+    final userId = _currentUser!.uid;
 
     return Scaffold(
-      backgroundColor: Colors.grey[100],
+      backgroundColor: Color(0xFF1B1B1B), // Màu nền xám
       appBar: AppBar(
-        backgroundColor: Color(0xFF3498DB),
-        title: Text("Thông tin cá nhân"),
+        backgroundColor: Color(0xFF2ECC71),
+        title: Text(
+          "Thông tin cá nhân",
+          style: TextStyle(
+            fontFamily: 'Roboto',
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+          ),
+        ),
         centerTitle: true,
       ),
       body: SingleChildScrollView(
@@ -108,17 +117,22 @@ class _UserInfoScreenState extends State<UserInfoScreen> {
             SizedBox(height: 20),
             CircleAvatar(
               radius: 50,
-              backgroundColor: Color(0xFFFFC0CB), // Hồng nhạt
+              backgroundColor: Color(0xFFFFC0CB),
               child: Icon(Icons.person, size: 60, color: Color(0xFF8E44AD)),
             ),
             SizedBox(height: 20),
             Text(
               userName,
-              style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+              style: TextStyle(
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                  fontFamily: 'Roboto'),
             ),
             Text(
               _currentUser!.email ?? 'N/A',
-              style: TextStyle(fontSize: 16, color: Colors.black54),
+              style: TextStyle(
+                  fontSize: 16, color: Colors.white70, fontFamily: 'Roboto'),
             ),
             SizedBox(height: 30),
             Card(
@@ -127,6 +141,7 @@ class _UserInfoScreenState extends State<UserInfoScreen> {
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(15),
               ),
+              color: Color(0xFF333333), // Thêm màu xám cho Card
               child: Padding(
                 padding: const EdgeInsets.all(20.0),
                 child: Column(
@@ -136,16 +151,21 @@ class _UserInfoScreenState extends State<UserInfoScreen> {
                       leading: Icon(Icons.wallet, color: Colors.green),
                       title: Text(
                         "Số dư ví",
-                        style: TextStyle(fontSize: 18),
+                        style: TextStyle(
+                            fontSize: 18,
+                            color: Colors.white,
+                            fontFamily: 'Roboto'),
                       ),
                       subtitle: Text(
-                        "\$${walletBalance.toStringAsFixed(2)}",
-                        style: TextStyle(fontSize: 16, color: Colors.black87),
+                        "${walletBalance.toStringAsFixed(0)}₫",
+                        style: TextStyle(
+                            fontSize: 16,
+                            color: Colors.white,
+                            fontFamily: 'Roboto'),
                       ),
                       trailing: IconButton(
                         icon: Icon(Icons.arrow_forward, color: Colors.blue),
                         onPressed: () {
-                          // Chuyển qua màn hình WalletScreen và truyền userId
                           Navigator.push(
                             context,
                             MaterialPageRoute(
@@ -155,16 +175,22 @@ class _UserInfoScreenState extends State<UserInfoScreen> {
                         },
                       ),
                     ),
-                    Divider(),
+                    Divider(color: Colors.white),
                     ListTile(
                       leading: Icon(Icons.person_outline, color: Colors.blue),
                       title: Text(
                         "Vai trò",
-                        style: TextStyle(fontSize: 18),
+                        style: TextStyle(
+                            fontSize: 18,
+                            color: Colors.white,
+                            fontFamily: 'Roboto'),
                       ),
                       subtitle: Text(
                         role == 'admin' ? 'Quản trị viên' : 'Người dùng',
-                        style: TextStyle(fontSize: 16),
+                        style: TextStyle(
+                            fontSize: 16,
+                            color: Colors.white,
+                            fontFamily: 'Roboto'),
                       ),
                     ),
                   ],
@@ -172,36 +198,57 @@ class _UserInfoScreenState extends State<UserInfoScreen> {
               ),
             ),
             SizedBox(height: 30),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20.0),
+              child: ElevatedButton.icon(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Color(0xFF2ECC71),
+                  padding: EdgeInsets.symmetric(vertical: 15),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(15),
+                  ),
+                ),
+                icon: Icon(Icons.logout, color: Colors.white),
+                label: Text(
+                  "Đăng xuất",
+                  style: TextStyle(
+                      fontSize: 18,
+                      fontFamily: 'Roboto',
+                      color: Colors.white),
+                ),
+                onPressed: () async {
+                  await FirebaseAuth.instance.signOut();
+                  Navigator.pushAndRemoveUntil(
+                    context,
+                    MaterialPageRoute(builder: (context) => LoginScreen()),
+                        (route) => false, // Xóa tất cả các màn hình trước đó
+                  );
+                },
+              ),
+            ),
           ],
         ),
       ),
-      bottomNavigationBar: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [
-              Color(0xFF8E44AD),
-              Color(0xFF3498DB),
-            ],
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: _selectedIndex,
+        selectedItemColor: Color(0xFF2ECC71), // Màu xanh lá khi chọn
+        unselectedItemColor: Colors.white, // Màu trắng khi chưa chọn
+        backgroundColor: Colors.grey, // Màu nền
+        items: const <BottomNavigationBarItem>[
+          BottomNavigationBarItem(
+            icon: Icon(Icons.event),
+            label: 'Sự kiện',
           ),
-          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-        ),
-        child: CurvedNavigationBar(
-          backgroundColor: Colors.transparent,
-          color: Colors.white,
-          buttonBackgroundColor: Color(0xFFFFC0CB),
-          height: 60,
-          index: 1,
-          animationDuration: Duration(milliseconds: 300),
-          items: [
-            Icon(Icons.event, size: 30, color: Colors.deepPurple),
-            Icon(Icons.person, size: 30, color: Colors.deepPurple),
-          ],
-          onTap: (index) {
-            NavigationHelper.navigateToScreen(context, index);
-          },
-        ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.local_offer),
+            label: 'Vé',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.person),
+            label: 'Tài khoản',
+          ),
+        ],
+        onTap: _onItemTapped,
       ),
     );
   }

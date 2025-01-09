@@ -15,7 +15,10 @@ class PaymentScreen extends StatelessWidget {
     double totalPrice = tickets.fold(0.0, (sum, ticket) => sum + ticket.price);
 
     return Scaffold(
-      appBar: AppBar(title: Text('Thanh toán')),
+      appBar: AppBar(
+        title: Text('Thanh toán'),
+        backgroundColor: Color(0xFF2ECC71), // Màu app bar đồng bộ với các màn hình khác
+      ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -95,7 +98,17 @@ class PaymentScreen extends StatelessWidget {
                   );
                 }
               },
-              child: Text('Thanh toán'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Color(0xFF2ECC71), // Màu nút thanh toán đồng bộ với app
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                padding: EdgeInsets.symmetric(vertical: 16),
+              ),
+              child: Text(
+                'Thanh toán',
+                style: TextStyle(fontSize: 18),
+              ),
             ),
           ],
         ),

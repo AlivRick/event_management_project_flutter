@@ -1,6 +1,10 @@
 import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:dio/dio.dart';
 
+import '../models/transaction_model.dart';
+import 'transaction_service.dart';
+import 'wallet_service.dart';
+
 class StripeService {
   StripeService._();
 
@@ -9,17 +13,17 @@ class StripeService {
   // Publishable Key - Thiết lập trực tiếp ở đây
   final String publishableKey = "pk_test_51QeI5mRq4X9sEHeUANrX4eM3miki91rRgQfKnCjoe7QctxmlU7poiuJUAihEmMlvoZQhrpCrWocPYokM7KkU2rsO00mu7bJpfk";
 
-  Future<bool> makePayment(int amount) async {
+  Future<bool> makePayment(int amount, String userId) async {
     try {
       // Thiết lập Stripe publishableKey trực tiếp ở đây
       Stripe.publishableKey = publishableKey;
 
       // Step 1: Create PaymentIntent with the specified amount
-      String? paymentIntentClientSecret = await _createPaymentIntent(amount, "usd");
+      String? paymentIntentClientSecret = await _createPaymentIntent(amount, "vnd");
       if (paymentIntentClientSecret == null) {
         print("Failed to create PaymentIntent.");
         return false;
-      }else {
+      } else {
         print("PaymentIntent created successfully: $paymentIntentClientSecret");
       }
 
@@ -27,7 +31,7 @@ class StripeService {
       await Stripe.instance.initPaymentSheet(
         paymentSheetParameters: SetupPaymentSheetParameters(
           paymentIntentClientSecret: paymentIntentClientSecret,
-          merchantDisplayName: "Ricky",
+          merchantDisplayName: "Ticket Bờ rồ",
         ),
       );
 
@@ -38,6 +42,25 @@ class StripeService {
 
       // Step 4: Handle Successful Payment
       print("Payment successful");
+
+      // Cập nhật số dư ví của người dùng trong Firebase
+      WalletService walletService = WalletService();
+      await walletService.updateWallet(userId, amount.toDouble());
+
+      print("Wallet updated successfully");
+
+      TransactionService transactionService = TransactionService();
+      UserTransaction transaction = UserTransaction(
+        id: '', // ID sẽ được gán tự động khi tạo
+        userId: userId,
+        type: 'DEPOSIT',
+        amount: amount.toDouble(),
+        date: DateTime.now(),
+      );
+      String transactionId = await transactionService.createTransaction(transaction);
+      print("Transaction created successfully: $transactionId");
+
+
       return true; // Payment was successful
     } catch (e) {
       print("Error during payment: $e");
@@ -53,7 +76,7 @@ class StripeService {
     try {
       final Dio dio = Dio();
       Map<String, dynamic> data = {
-        "amount": _calculateAmount(amount),
+        "amount": amount,
         "currency": currency,
       };
       var response = await dio.post(
@@ -75,10 +98,5 @@ class StripeService {
       print("Error in _createPaymentIntent: $e");
     }
     return null;
-  }
-  // Calculate amount in cents (Stripe expects amount in cents)
-  String _calculateAmount(int amount) {
-    final calculateAmount = amount * 100;  // Convert to cents
-    return calculateAmount.toString();
   }
 }

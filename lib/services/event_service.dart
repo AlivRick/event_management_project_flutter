@@ -8,7 +8,6 @@ class EventService {
   Future<String> createEvent(Event event) async {
     final docRef = await FirebaseFirestore.instance.collection('events').add(event.toMap());
     final eventId = docRef.id;
-
     // Cập nhật thêm trường 'id' bên trong document
     await docRef.update({'id': eventId});
 

@@ -63,7 +63,24 @@ class _CartScreenState extends State<CartScreen> {
     }
   }
 
-  void _navigateToPaymentScreen() {
+  void _navigateToPaymentScreen() async {
+    // Kiểm tra xem có vé nào hết hạn hoặc hết vé không
+    bool hasInvalidTickets = false;
+    for (var ticket in cartItems) {
+      bool isSoldOut = await _isTicketSoldOut(ticket);
+      if (isSoldOut) {
+        hasInvalidTickets = true;
+        break; // Nếu có vé hết, không cho phép thanh toán
+      }
+    }
+
+    if (hasInvalidTickets) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Có vé hết hạn hoặc hết vé. Vui lòng xóa chúng khỏi giỏ hàng.")),
+      );
+      return; // Dừng thanh toán nếu có vé hết hạn hoặc hết vé
+    }
+
     if (userId == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text("Vui lòng đăng nhập trước khi thanh toán.")),
@@ -87,7 +104,7 @@ class _CartScreenState extends State<CartScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Giỏ hàng'),
-        backgroundColor: Color(0xFF3498DB),
+        backgroundColor: Color(0xFF2ECC71), // Màu nền đồng bộ với các màn hình khác
         actions: [
           if (cartItems.isNotEmpty)
             IconButton(
@@ -155,7 +172,7 @@ class _CartScreenState extends State<CartScreen> {
         child: ElevatedButton(
           onPressed: _navigateToPaymentScreen, // Navigate to PaymentScreen
           style: ElevatedButton.styleFrom(
-            backgroundColor: Color(0xFF3498DB),
+            backgroundColor: Color(0xFF2ECC71), // Màu nền đồng bộ
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(8),
             ),
